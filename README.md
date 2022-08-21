@@ -206,7 +206,7 @@ Digite o seguinte no arquivo php:
 </body>
 </html>
 Agora vamos subir o container e "linkar" os diretórios local e do container:
-
+```
 ```bash
 docker run --name php-image -d -p 8080:80 --volume=/data/php-image:/var/www/html php:7.4-apache
 ```
