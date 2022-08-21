@@ -80,11 +80,18 @@ Aqui você precisa atualizar os repositórios:
 #### Parando o container e reiniciando
 ```bash
    docker stop id/name (substitua o id pela numeracao ou apenas use o name, pode ser visto usando o docker ps)
-   docker start id/name (Aqui os dados não foram perdidos, mas caso você apaga o container, para não correr risco de perder dados por precaução deve mapear um lugar para salvar eles)
+   docker start id/name (Aqui os dados não foram perdidos, mas caso você apague o container, para não perder dados deve mapear um lugar para salvar eles)
 ```
 #### Excluindo o container
 ```bash
-   docker rmi id/name (substitua o id pela numeracao ou apenas use o name, pode ser visto usando o docker ps)
+   docker rm id/name (substitua o id pela numeracao ou apenas use o name, pode ser visto usando o docker ps, se você colocar um -f ele força a exclusão e não precisa dar um stop antes)
+```
+
+#### Excluindo tudo?
+ PS = Muito cuidado, não vá utilizar sem cautela, esses comandos realmente apagam tudo em desuso, vai perder dados se não for sábio.
+```bash
+   docker container prune (containers)
+   docker volume prune (volumes)
 ```
 
 ### Dockerfile
@@ -119,15 +126,59 @@ Após salvar só fazer a build
 ```bash
    docker pull mysql (Ele vai buscar a imagem do mysql no dockerhub, ultima versão porque não especifiquei nenhuma TAG)
    docker run -e MYSQL_ROOT_PASSWORD=root --name mysql-container -d -p 3306:3306 mysql (-d executa em segundo plano, -p para publicar as portas do container para acessar via host, -e para setar variaveis de ambiente, o ultimo comando é o nome da imagem que foi baixada)
+   
    docker exec -it mysql-container bash (estou chamando o bash do container)
    mysql -u root -p --protocol=tcp (aqui estamos passando o user com -u e o protocolo usado, após confirmar com a senha definida no run veremos a identificação "mysql" e aí sim poderemos por exemplo, criar um database)
+   
    CREATE DATABASE aulateste;
    SHOW DATABASES;
    exit (para sair do mysql)
    exit (para sair do container)
+   
    ip a (procure a interface de rede com nome de docker, cada container recebe um ip)
    docker inspect nomeContainer (retorna informações do seu container)
-   apt -y install mysql-client (com ele não precisamos abrir o bash do container só pra executar o comando do mysql -u root -p --protocol=tcp)
+   apt -y install mysql-client (com ele não precisamos abrir o bash do container só para entrar no ambiente "mysql", só executar o comando do mysql -u root -p --protocol=tcp)
 
 ```
+
+#### Excluindo o container MYSQL - CUIDADOS
+Ao excluir o container os dados serão apagados, para envitar isso mapeamos um local para guardar os dados do volume, um local que não seja dentro do container, isso é feito na execução do container:
+
+```bash
+   docker inspect mysql-container (usaremos para procurar a origem dos dados do container mysql, procure por volume para encontrar o caminho - procurando achamos /var/lib/mysql")
+   
+   docker run -e MYSQL_ROOT_PASSWORD=root --name mysql-container -d -p 3306:3306 mysql --volume=/data/mysql-container:/var/lib/mysql (aqui nós criamos uma pasta chamada data e dentro dela uma pasta com o nome do container, direto da raiz do diretório, assim os dados serão salvos ali - indicamos então DESTINO:ORIGEM dos dados do container usando o -v ou --volume=)
+```
+### Essa forma de persistir dados usada acima é chamada de mount do tipo BIND - que é basicamente vincular um determinado diretório ou arquivo
+### PS: Ao indicar o volume na hora de subir o container, os dados do mysql serão salvos no Host, o que me permite excluir o container e manter os dados tranquilamente, quando for subir um novo container mysql é só você indicar o mesmo volume e ele irá receber os dados que estavam salvos na pasta destino.
+
+
+#### Persistência de dados com mount
+##### Bind
+  Vincular um arquivo ou diretório do host para o container, assim permitindo que os dados fiquem armazenados e sejam reutilizados em próximas instâncias de container.
+  Exemplo:
+  
+  ###### docker run -dti --mount type=bind,src=/datadir/imagedir,dst=/data debian
+  (aqui --mount permite escolher o tipo de mount, que no caso é bind, src é nossa pasta local, dst indica uma pasta que deve ser criada no container, estamos usando a imagem do debian, se eu colocar um ",ro" antes de indicar a imagem, não poderão mexer nos arquivos lá pois serão de apenas leitura)
+  
+##### Named
+  ```bash
+    docker volume ls (lista os volumes)
+    docker volume create data-debian (criando volume com nome data-debian, é criado na pasta padrão do docker /var/lib/docker)
+  ```
+  Você cria um volume nomeado e ele já é salvo em um diretório sob controle do docker (padrão), são referenciados pelo seu nome, o que facilita a organização, agora só referenciar na hora de subir o container:
+  ```bash
+  docker run -dti --name debian-container --mount type=volume,src=data-debian,dst=/data
+  (criamos um mount do tipo volume, no src é só indicar o nome do volume criado, o resto se mantém, dti -> segundo plano, pseudo terminal e interação, dst=/data cria a pasta na raiz do debian)
+```
+ E para apagar o volume: 
+  ```bash
+   docker volume rm nomeVolume
+   docker volume prune (apaga todos os volumes que não estão em uso, então cuidado)
+```
+
+##### Dockerfile volume
+  Basicamente usamos a instrução VOLUME no arquivo dockerfile e ele será salvo de maneira similar ao named.
+
+#### PS = Sempre verificar que tipo de mount você está usando com o docker inspect nomeContainer
 
