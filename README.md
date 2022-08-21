@@ -122,7 +122,7 @@ Após salvar só fazer a build
    docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
    docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
 ```
-##### Docker image MYSQL
+### Docker image MYSQL - Exemplo 
 ```bash
    docker pull mysql (Ele vai buscar a imagem do mysql no dockerhub, ultima versão porque não especifiquei nenhuma TAG)
    docker run -e MYSQL_ROOT_PASSWORD=root --name mysql-container -d -p 3306:3306 mysql (-d executa em segundo plano, -p para publicar as portas do container para acessar via host, -e para setar variaveis de ambiente, o ultimo comando é o nome da imagem que foi baixada)
@@ -182,3 +182,61 @@ Ao excluir o container os dados serão apagados, para envitar isso mapeamos um l
 
 #### PS = Sempre verificar que tipo de mount você está usando com o docker inspect nomeContainer
 
+
+### Docker image APACHE - Exemplo 
+#### Apache Container
+
+Baixando a imagem oficial do apache:
+
+```bash
+docker pull httpd
+```
+Criando o diretório local onde ficará a aplicação:
+```bash
+mkdir /data/apache-image
+nano /data/apache-image/index.html
+```
+Digite o seguinte conteúdo no index:
+```bash
+<html>
+<head></head>
+<body>
+<h1>Apache OK</h1>
+</body>
+</html>
+```
+Agora vamos subir o container e "linkar" os diretórios local e do container:
+
+```bash
+docker run --name apache-image -d -p 80:80 --volume=/data/apache-image:/usr/local/apache2/htdocs httpd
+```
+
+Após isso nós pegamos o ip da máquina para testar no navegador.
+
+### Docker image APACHE com PHP - Exemplo 
+Vamos baixar a imagem do PHP com APACHE:
+```bash
+docker pull php:7.4-apache
+```
+Criaremos um diretório para o arquivo
+```bash
+   mkdir /data/php-image
+   nano /data/php-image/index.php
+```
+Digite o seguinte no arquivo php:
+```bash
+<html>
+<head></head>
+<body>
+<h1>Apache OK</h1>
+
+<?php phpinfo(); ?>
+</body>
+</html>
+Agora vamos subir o container e "linkar" os diretórios local e do container:
+
+```bash
+docker run --name php-image -d -p 8080:80 --volume=/data/php-image:/var/www/html php:7.4-apache
+```
+
+Após isso nós pegamos o ip da máquina para testar no navegador.
