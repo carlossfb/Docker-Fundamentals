@@ -298,7 +298,7 @@ Após salvar só fazer a build
    docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
    docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
 ```
-#### Criando o Dockerfile
+#### Dockerfile APACHE - movimentando o site
  comando para baixar o arquivo do site usado no exemplo: wget http://site1368633667.hospedagemdesites.ws/site1.zip
 
 ```bash
@@ -320,6 +320,30 @@ Após salvar só fazer a build
 ```bash
    docker image build -t debian-apache:1.0 .
    docker run  -dti -p 80:80 --name meu-apache debian-apache:1.0
+```
+#### Criando o Dockerfile a partir de uma linguagem de programação
+Arquivo python:
+
+nome = input("Qual é o seu nome? ")
+	print (nome)
+
+
+=====================================
+
+Dockerfile:
+```bash
+FROM python
+
+WORKDIR /usr/src/app
+
+COPY app.py /usr/src/app
+
+CMD [ "python", "./app.py" ]
+```
+Hora de executar:
+```bash
+   docker image build -t app-python:1.0 . (o . no final indica que o dockerfile está no diretório atual)
+   docker run -ti app-python:1.0 (executando a imagem gerada no comando anterior)
 ```
 
 ### Links úteis
