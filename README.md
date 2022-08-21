@@ -298,3 +298,34 @@ Após salvar só fazer a build
    docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
    docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
 ```
+
+### Links úteis
+#### O que são containers? 
+
+https://www.ibm.com/br-pt/cloud/learn/containers
+
+https://www.redhat.com/pt-br/topics/containers
+
+ 
+
+#### Diferenças entre containers e máquinas virtuais (VMs)
+
+https://www.redhat.com/pt-br/topics/containers/containers-vs-vms
+
+  
+
+#### O que é Docker? 
+
+https://www.redhat.com/pt-br/topics/containers/what-is-docker
+
+https://docs.microsoft.com/pt-br/dotnet/architecture/microservices/container-docker-introduction/docker-defined
+
+  
+
+#### Comandos essenciais 
+
+https://medium.com/xp-inc/principais-comandos-docker-f9b02e6944cd
+
+https://docs.docker.com/engine/reference/commandline/docker/
+
+https://dev.to/soutoigor/docker-imagens-containers-e-seus-principais-comandos-23p6 
