@@ -298,6 +298,29 @@ Após salvar só fazer a build
    docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
    docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
 ```
+#### Criando o Dockerfile
+ comando para baixar o arquivo do site usado no exemplo: wget http://site1368633667.hospedagemdesites.ws/site1.zip
+
+```bash
+   nano dockerfile (criaremos o arquivo e editaremos com o nano)
+```
+No arquivo digite:
+```bash
+   FROM debian (indica a base do container)
+   RUN apt-get update && apt-get install -y apache2 && apt-get clean (o & comercial está adicionando os comandos que seriam individuais, por ultimo o clean limpa os arquivos baixados)
+   ADD site.tar /var/www/html (O add vai copiar o arquivo para o local indicado e descompactar o TAR)
+   LABEL description="Apache Webserver 1.0" (Descrição)
+   VOLUME /var/www/html/ (Criamos o volume onde os arquivos devem ser salvos)
+   EXPOSE 80 (Porta que queremos expor)
+
+   ENTRYPOINT ["/usr/sbin/apachectl"] (localização do executavel do apache)
+   CMD ["-D", "FOREGROUND"] (Indicando que deve rodar em primeiro plano)
+```
+Após salvar só fazer a build
+```bash
+   docker image build -t debian-apache:1.0 .
+   docker run  -dti -p 80:80 --name meu-apache debian-apache:1.0
+```
 
 ### Links úteis
 #### O que são containers? 
