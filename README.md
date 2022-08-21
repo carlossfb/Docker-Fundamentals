@@ -94,34 +94,6 @@ Aqui você precisa atualizar os repositórios:
    docker volume prune (volumes)
 ```
 
-### Dockerfile
-
-#### Introduzindo Dockerfile
-
-```bash
-   nano app.py (criaremos uma aplicação python simples que imprime o nome da pessoa)
-```
-No arquivo digite:
-```bash
-   nome = input("Qual seu nome?")
-   print(nome)
-```
-##### Criando o Dockerfile
-```bash
-   nano dockerfile (criaremos o arquivo e editaremos com o nano)
-```
-No arquivo digite:
-```bash
-   FROM ubuntu (indica a base do container)
-   RUN apt update && apt install -y python3 && apt clean (o & comercial está adicionando os comandos que seriam individuais, por ultimo o clean limpa os arquivos baixados)
-   COPY app.py /opt/app.py (copiando para dentro do container)
-   CMD python3 /opt/app.py (executando o arquivo utilizando python3)
-```
-Após salvar só fazer a build
-```bash
-   docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
-   docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
-```
 ### Docker image MYSQL - Exemplo 
 ```bash
    docker pull mysql (Ele vai buscar a imagem do mysql no dockerhub, ultima versão porque não especifiquei nenhuma TAG)
@@ -149,8 +121,8 @@ Ao excluir o container os dados serão apagados, para envitar isso mapeamos um l
    
    docker run -e MYSQL_ROOT_PASSWORD=root --name mysql-container -d -p 3306:3306 mysql --volume=/data/mysql-container:/var/lib/mysql (aqui nós criamos uma pasta chamada data e dentro dela uma pasta com o nome do container, direto da raiz do diretório, assim os dados serão salvos ali - indicamos então DESTINO:ORIGEM dos dados do container usando o -v ou --volume=)
 ```
-### Essa forma de persistir dados usada acima é chamada de mount do tipo BIND - que é basicamente vincular um determinado diretório ou arquivo
-### PS: Ao indicar o volume na hora de subir o container, os dados do mysql serão salvos no Host, o que me permite excluir o container e manter os dados tranquilamente, quando for subir um novo container mysql é só você indicar o mesmo volume e ele irá receber os dados que estavam salvos na pasta destino.
+#### Essa forma de persistir dados usada acima é chamada de mount do tipo BIND - que é basicamente vincular um determinado diretório ou arquivo
+#### PS: Ao indicar o volume na hora de subir o container, os dados do mysql serão salvos no Host, o que me permite excluir o container e manter os dados tranquilamente, quando for subir um novo container mysql é só você indicar o mesmo volume e ele irá receber os dados que estavam salvos na pasta destino.
 
 
 #### Persistência de dados com mount
@@ -158,7 +130,7 @@ Ao excluir o container os dados serão apagados, para envitar isso mapeamos um l
   Vincular um arquivo ou diretório do host para o container, assim permitindo que os dados fiquem armazenados e sejam reutilizados em próximas instâncias de container.
   Exemplo:
   
-  ###### docker run -dti --mount type=bind,src=/datadir/imagedir,dst=/data debian
+###### docker run -dti --mount type=bind,src=/datadir/imagedir,dst=/data debian
   (aqui --mount permite escolher o tipo de mount, que no caso é bind, src é nossa pasta local, dst indica uma pasta que deve ser criada no container, estamos usando a imagem do debian, se eu colocar um ",ro" antes de indicar a imagem, não poderão mexer nos arquivos lá pois serão de apenas leitura)
   
 ##### Named
@@ -240,3 +212,88 @@ docker run --name php-image -d -p 8080:80 --volume=/data/php-image:/var/www/html
 ```
 
 Após isso nós pegamos o ip da máquina para testar no navegador.
+
+#### Delimitando recursos para os containers
+
+Visualizando uso de recursos:
+
+```bash
+docker stats nomeContainer
+```
+containers já criados podemos atualizar e impor limites com o update, caso contrário os parâmetros podem ser passados na hora de escrever o comando run:
+
+```bash
+docker update nomeContainer -m 128M --cpus 0.2 (-m para limitar uso de memória e --cpus 0.2 para definir o uso de cpu como 20% no máximo)
+```
+Após definido o limite, experimente usar o stats (comando anterior, novamente)
+
+#### Estressando o container
+```bash
+docker exec -ti nomeContainer bash (abrir o bash do container)
+apt update (atualizar)
+apt -y install stress
+stress --cpu 1 --vm-bytes 50m --vm 1 --vm-bytes 50m (--vm-bytes define o volume de dados, o numero do lado indica o tamanho em bytes, o --vm 1 indica que um pacote será enviado para estressar a memória, um de também 50 bytes )
+```
+#### Logs e processos
+
+Visualizando uso de recursos:
+
+```bash
+docker info (dá informações sobre o servidor)
+docker top nomeContainer (mostra processos)
+docker logs nomeContainer (logs do container)
+```
+
+#### Isolando conjunto de containers com uma rede
+
+Reunindo informações sobre a rede:
+```bash
+docker network inspect
+```
+Aqui nós iremos usar o bash do container ubuntu para instalar o ping e testar a conectividade
+```bash
+docker exec -ti nomeContainer bash
+apt update
+apt install -y iputils-ping
+```
+Hora de criar a rede e colocar os containers nela
+```bash
+docker network create minha-rede
+docker run -dti --name nomeContainer --network minha-rede ubuntu
+docker run -dti --name nomeContainer2 --network minha-rede ubuntu
+```
+Hora de testar a conectividade com o ping instalado no nomeContainer
+```bash 
+docker exec -ti nomeContainer bash
+ping ipContainer2 (aqui vamos pingar os containers vistos no primeiro comando)
+docker network inspect minha-rede
+``` 
+
+
+### Dockerfile
+#### Introduzindo Dockerfile
+
+```bash
+   nano app.py (criaremos uma aplicação python simples que imprime o nome da pessoa)
+```
+No arquivo digite:
+```bash
+   nome = input("Qual seu nome?")
+   print(nome)
+```
+##### Criando o Dockerfile
+```bash
+   nano dockerfile (criaremos o arquivo e editaremos com o nano)
+```
+No arquivo digite:
+```bash
+   FROM ubuntu (indica a base do container)
+   RUN apt update && apt install -y python3 && apt clean (o & comercial está adicionando os comandos que seriam individuais, por ultimo o clean limpa os arquivos baixados)
+   COPY app.py /opt/app.py (copiando para dentro do container)
+   CMD python3 /opt/app.py (executando o arquivo utilizando python3)
+```
+Após salvar só fazer a build
+```bash
+   docker build . -t ubuntu-python (. indica que o arquivo está no mesmo diretório e o -t permite indicar o nome da imagem)
+   docker run -it --name meuapp ubuntu-python (não usamos -dti porque o d indicaria que seria executado em segundo plano e no arquivo python precisamos digitar nosso nome pro script ter utilidade)
+```
