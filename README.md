@@ -377,6 +377,8 @@ mkdir /compose/primeiro (diretório para deixar os arquivos docker-compose)
 ```bash
    nano /compose/primeiro/docker-compose.yml
 ```
+sobre versões: https://docs.docker.com/compose/compose-file/compose-versioning/
+
 #### Agora vamos ao conteúdo:
 ```bash
 version: '3.7'
