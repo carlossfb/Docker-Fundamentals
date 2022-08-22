@@ -360,7 +360,7 @@ systemctl restart docker (restart para funcionar)
 
 docker push  localhost:5000/my-go-app:1.0 (enviando novamente)
 ```
-#### Docker Compose
+## Docker Compose
 O docker-compose é uma forma de através de um arquivo de configuração YAML definir diferentes características para um mesmo sistema através da definição de dois ou mais containers, subindo todas as dependências para seu projeto funcionar, tudo isso com um único comando.
 
 ```bash
