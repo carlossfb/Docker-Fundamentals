@@ -379,13 +379,13 @@ mkdir /compose/primeiro (diretório para deixar os arquivos docker-compose)
 ```
 #### Agora vamos ao conteúdo:
 ```bash
-version: '3.8'
+version: '3.7'
 
 services:
-  mysqlsrv:
+  mysqlsv:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: "Senha123"
+      MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "testedb"
     ports:
       - "3306:3306"
