@@ -360,6 +360,56 @@ systemctl restart docker (restart para funcionar)
 
 docker push  localhost:5000/my-go-app:1.0 (enviando novamente)
 ```
+#### Docker Compose
+O docker-compose é uma forma de através de um arquivo de configuração YAML definir diferentes características para um mesmo sistema através da definição de dois ou mais containers, subindo todas as dependências para seu projeto funcionar, tudo isso com um único comando.
+
+```bash
+apt-get install -y docker-compose (instalando)
+```
+Criando um diretório para usar como mount BIND.
+```bash
+mkdir /data
+mkdir /data/mysql-A
+mkdir /compose
+mkdir /compose/primeiro (diretório para deixar os arquivos docker-compose)
+```
+#### Criando o arquivo YAML ou YML
+```bash
+   nano /compose/primeiro/docker-compose.yml
+```
+#### Agora vamos ao conteúdo:
+```bash
+version: '3.8'
+
+services:
+  mysqlsrv:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "Senha123"
+      MYSQL_DATABASE: "testedb"
+    ports:
+      - "3306:3306"
+    volumes:
+      - /data/mysql-C:/var/lib/mysql
+    networks:
+      - minha-rede
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - minha-rede
+
+networks: 
+  minha-rede:
+    driver: bridge
+```
+
+#### Hora de rodar:
+```bash
+   docker-compose up -d
+```
 
 ### Links úteis
 #### O que são containers? 
