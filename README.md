@@ -345,6 +345,21 @@ Hora de executar:
    docker image build -t app-python:1.0 . (o . no final indica que o dockerfile está no diretório atual)
    docker run -ti app-python:1.0 (executando a imagem gerada no comando anterior)
 ```
+#### Criando um servidor de imagens
+```bash
+docker run -d -p 5000:5000 --restart=always --name registry registry:2 (ao dar run no registry sem pull antes, ele identifica que você não tem e já baixa sozinho)
+docker logout (saindo do dockerhub por precaução)
+docker image tag [id] localhost:5000/meu-apache:1.0 (mudando a tag da image)
+curl localhost:5000/v2/_catalog 
+docker push  localhost:5000/my-go-app:1.0 (enviando para o servidor)
+nano /etc/docker/daemon.json (editando o arquivo com o conteúdo abaixo, para que permita o envio mesmo pelo metodo http, sem exigir o https)
+
+	{ "insecure-registries":["10.0.0.189:5000"] }
+	
+systemctl restart docker (restart para funcionar)
+
+docker push  localhost:5000/my-go-app:1.0 (enviando novamente)
+```
 
 ### Links úteis
 #### O que são containers? 
