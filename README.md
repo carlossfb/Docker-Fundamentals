@@ -410,7 +410,8 @@ networks:
 
 #### Hora de rodar:
 ```bash
-   docker-compose up -d
+   docker-compose up -d (-d para segundo plano)
+   docker-compose down (stop + remove, as redes são apagadas, containers também)
 ```
 
 ### Links úteis
