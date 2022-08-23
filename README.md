@@ -414,7 +414,7 @@ networks:
    docker-compose down (stop + remove, as redes são apagadas, containers também)
 ```
 
-#### APACHE - PHP - MYSQL
+##### EXEMPLO - APACHE - PHP - MYSQL
 
 docker-compose.yml
 ```bash
