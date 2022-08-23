@@ -414,9 +414,9 @@ networks:
    docker-compose down (stop + remove, as redes são apagadas, containers também)
 ```
 
-##### EXEMPLO - APACHE - PHP - MYSQL
+### EXEMPLO - APACHE - PHP - MYSQL
 
-docker-compose.yml
+##### docker-compose.yml
 ```bash
 version: "3.7"
 
@@ -460,7 +460,7 @@ networks:
    minha-rede:
      driver: bridge
 ```
- uploads.ini
+##### uploads.ini
 ```bash 
 file_uploads = On
 memory_limit = 500M
@@ -472,7 +472,7 @@ max_execution_time = 5000
 max_input_time = 5000
 ```
 
-index.php
+##### index.php
 ```bash
 <html>
 
