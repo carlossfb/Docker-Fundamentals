@@ -415,10 +415,9 @@ networks:
 ```
 
 #### APACHE - PHP - MYSQL
-===============================================
-docker-compose.yml
-===============================================
 
+docker-compose.yml
+```bash
 version: "3.7"
 
 services:
@@ -460,11 +459,9 @@ services:
 networks:
    minha-rede:
      driver: bridge
-
-=============================================================
+```
  uploads.ini
-=============================================================
- 
+```bash 
 file_uploads = On
 memory_limit = 500M
 upload_max_filesize = 500M
@@ -473,10 +470,10 @@ max_execution_time = 600
 max_file_uploads = 50000
 max_execution_time = 5000
 max_input_time = 5000
+```
 
-=============================================================
 index.php
-=============================================================
+```bash
 <html>
 
 <head>
@@ -527,7 +524,7 @@ mysqli_close($link);
 ?>
 
 </html>
-
+```
 
 ### Links úteis
 #### O que são containers? 
