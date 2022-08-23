@@ -414,6 +414,121 @@ networks:
    docker-compose down (stop + remove, as redes são apagadas, containers também)
 ```
 
+#### APACHE - PHP - MYSQL
+===============================================
+docker-compose.yml
+===============================================
+
+version: "3.7"
+
+services:
+  web:
+    image: webdevops/php-apache:alpine-php7
+    ports:
+      - "4500:80"
+    volumes:
+      - /data/php/:/app
+
+    networks:
+      - minha-rede
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "Senha123"
+      MYSQL_DATABASE: "testedb"
+    ports:
+      - "3306:3306"
+    volumes:
+      - /data/mysql-C:/var/lib/mysql
+
+    networks:
+      - minha-rede
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: "Senha123"
+    ports:
+      - "8080:80"
+    volumes:
+      - /data/php/admin/uploads.ini:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
+
+    networks:
+      - minha-rede
+
+networks:
+   minha-rede:
+     driver: bridge
+
+=============================================================
+ uploads.ini
+=============================================================
+ 
+file_uploads = On
+memory_limit = 500M
+upload_max_filesize = 500M
+post_max_size = 500M
+max_execution_time = 600
+max_file_uploads = 50000
+max_execution_time = 5000
+max_input_time = 5000
+
+=============================================================
+index.php
+=============================================================
+<html>
+
+<head>
+<title>Exemplo PHP</title>
+</head>
+
+
+<?php
+ini_set("display_errors", 1);
+header('Content-Type: text/html; charset=iso-8859-1');
+
+
+
+echo 'Versao Atual do PHP: ' . phpversion() . '<br>';
+
+$servername = "db";
+$username = "root";
+$password = "Senha123";
+$database = "testedb";
+
+// Criar conexão
+
+
+$link = new mysqli($servername, $username, $password, $database);
+
+/* check connection */
+if (mysqli_connect_errno()) {
+    printf("Connect failed: %s\n", mysqli_connect_error());
+    exit();
+}
+
+$query = "SELECT * FROM tabela_exemplo";
+
+if ($result = mysqli_query($link, $query)) {
+
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        printf ("%s %s %s <br>", $row["nome"], $row["cidade"], $row["salario"]);
+    }
+
+    
+    mysqli_free_result($result);
+}
+
+
+mysqli_close($link);
+
+?>
+
+</html>
+
+
 ### Links úteis
 #### O que são containers? 
 
