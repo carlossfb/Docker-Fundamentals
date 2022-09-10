@@ -609,7 +609,14 @@ https://www.redhat.com/pt-br/topics/containers
 
 https://www.redhat.com/pt-br/topics/containers/containers-vs-vms
 
-  
+#### Conhecendo o Vagrant
+
+https://blog.mandic.com.br/artigos/devops-conhecendo-vagrant/
+
+#### O que é orquestração de containers?
+
+https://www.redhat.com/pt-br/topics/containers/what-is-container-orchestration
+
 
 #### O que é Docker? 
 
