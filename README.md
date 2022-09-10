@@ -154,6 +154,14 @@ Ao excluir o container os dados serão apagados, para envitar isso mapeamos um l
 
 #### PS = Sempre verificar que tipo de mount você está usando com o docker inspect nomeContainer
 
+### Docker - MySQL - Definitivo
+**Criando um container do mysql especificando acesso e nome do banco a ser utilizado enquanto indicamos um volume criado e montamos referenciando o local padrão do mysql
+
+PS= Anteriormente foi executado um **docker volume create data**
+
+  ```bash
+docker run -e MYSQL_ROOT_PASSWORD=Senha123 -e MYSQL_DATABASE=meubanco --name mysql-A -d -p 3306:3306 --mount type=volume,src=data,dst=/var/lib/mysql mysql
+```
 
 ### Docker image APACHE - Exemplo 
 #### Apache Container
