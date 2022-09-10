@@ -526,6 +526,76 @@ mysqli_close($link);
 </html>
 ```
 
+## Docker Swarm
+
+Recurso do Docker que fornece funcionalidades de orquestração de containers, incluindo clustering nativo de hosts do Docker. Um grupo de hosts do Docker formam um cluster "Swarm"
+
+#### Swarm
+Cada host que faz parte do **cluster** é um Nó:
+
+**Nós gerenciadores:** Aqui são executados os comandos CLI do Docker para controlar e monitorar o swarm.
+**Nós de trabalho:** Para participar de um swarm precisa do "token de associação" gerado pelo nó gerenciador quando o swarm for inicializado.
+
+Para que um cluster Swarm se mantenha ativo, preciso de pelo menos 51% dos managers funcionando, então se eu tiver 1 manager e 2 backups, perdi 1, terei mais de 60% funcional, agora se cair 2 o cluster cai.
+**PS:** A dica então é manter os números dos managers ímpares, assim se um nó cair, o outro assume automaticamente.
+
+```bash
+   docker swarm init
+```
+Ao iniciar um swarm, terá no bash uma linha de código que servirá como **convite** para outros hosts que serão nós de trabalho.
+```bash
+   docker service ls (Lista os serviços criados)
+   docker service create --name web --replicas 15 -p 80:80 httpd (cria um serviço com nome "web" e para ele cria 15 replicas, serão 15 containers com a mesma imagem indicada, onde respondem no host pela porta 80 e no container 80 também)
+   docker service ps web (Lista os containers do serviço indicado "web" e a quais nós estão associados)
+   docker service rm web (Apagar o service "web")
+```
+**Atualizando estado de um Nó**
+```bash
+   docker node update --availability pause aws1 (O nó com nome aws1 não receberá mais containers, para receber precisará ter estado active)
+   docker node update --availability drain aws1 (Os containers que estiverem com o nó serão retirados e repassados para outros nós)
+
+```
+
+### Exemplo - Consistência de dados em cada Nó
+```bash
+   docker volume create app (Criando um volume com nome de app)
+   cd /var/lib/docker/volumes/app/_data (acessando o local onde ficará o volume)
+   nano index.html (-> criar um h1 simples aqui)
+   cd .. (voltando para app)
+```
+**Agora vamos criar o service com a imagem do Apache2 e montar o volume criado anteriormente referenciando o local onde ficam os arquivos no Apache.**
+```bash
+   docker service create --name meu-app --replicas 15 -dt  -p 80:80 --mount type=volume,src=app,dst=/usr/local/apache2/htdocs/ httpd 
+```
+**Usaremos o NFS-SERVER para replicar o nosso volume para outros nós**
+```bash
+   apt install nfs-server -y
+```
+**Para configurar iremos editar o arquivo exports**
+```bash
+   nano /etc/exports
+```
+**Ao final do arquivo colocamos o local onde estão os dados do volume criado e indicamos que * ou seja, para todos, iremos dar RW leitura e escrita, SYNC para sincronizar, SUBTREE_CHECK para indicar que subpastas estão inclusas**
+```bash
+   /var/lib/docker/volumes/app_data *(rw,sync,subtree_check)
+```
+**Ao final do arquivo colocamos o local onde estão os dados do volume criado e indicamos que * ou seja, para todos, iremos dar RW leitura e escrita, SYNC para sincronizar, SUBTREE_CHECK para indicar que subpastas estão inclusas**
+```bash
+   exportsfs -ar (lembrando que devemos liberar o firewall para que o nfs funcione, usando o grupo de segurança e adicionando o ip da própria rede, a identificação será NFS)
+```
+**Instalando o cliente do nfs para consumir as regras criadas**
+```bash
+apt install nfs-common -y
+```
+**Verificar se o volume está acessível no cliente, precisará adicionar o método UDP no grupo de segurança para o ip da rede**
+```bash
+showmount -e 172.31.0.185 
+```
+**Montando o diretório acessado para o Nó atual**
+```bash
+mount 172.31.0.185:/var/lib/docker/volumes/app_data /var/lib/docker/volumes/app_data 
+```
+
 ### Links úteis
 #### O que são containers? 
 
